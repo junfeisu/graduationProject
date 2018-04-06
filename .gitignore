@@ -1,0 +1,14 @@
+# npm | yarn
+yarn.lock
+yarn.error.*
+npm-debug.*
+static/yarn.lock
+static/yarn.error.*
+static/npm-debug.*
+
+# node_modules
+node_modules/*
+static/node_modules/*
+
+# macOS
+.DS_Store

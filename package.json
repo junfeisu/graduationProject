@@ -1,0 +1,31 @@
+{
+  "name": "graduationproject",
+  "version": "1.0.0",
+  "description": "A graduation project based on Web-based online cinema ticket system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/junfei:graduationProject.git"
+  },
+  "keywords": [
+    "graduation",
+    "project"
+  ],
+  "author": "junfeisu (sjffly)",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "child_process": "^1.0.2",
+    "consolidate": "^0.15.1",
+    "cookie-parser": "^1.4.3",
+    "core-js": "^2.5.4",
+    "express": "^4.16.3",
+    "husky": "^0.14.3",
+    "json-mock-kuitos": "^1.2.0",
+    "mongoose": "^5.0.12",
+    "morgan": "^1.9.0"
+  }
+}
