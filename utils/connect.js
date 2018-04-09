@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
 
 function connect () {
-  mongoose.connect('mongodb://localhost/birthdayCollection')
+  mongoose.connect('mongodb://localhost/graduationProject')
 
   var db = mongoose.connection;
 

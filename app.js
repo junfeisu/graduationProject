@@ -5,13 +5,17 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const app = express()
 const mongoose = require('mongoose')
-const connect = require('./model/connect')
+const connect = require('./utils/connect')
+const userAPI = require('./routes/user')
 
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'static/dist/')))
+
+// API
+app.use('/api/user', userAPI)
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found')
