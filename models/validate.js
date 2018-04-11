@@ -5,31 +5,47 @@ function judgeType (param) {
   }
 }
 
+function typeHandler (context, type) {
+  var self = context
+  var fn = (function () {
+    return function () {
+      if (!self.stop) {
+        if (!judgeType(self.value)(type)) {
+          var message = self.key + ' should be a/an ' + type
+          self.setResult(message)
+        }
+      }
+
+      self.next()
+    }
+  }())
+  
+  self.tasks.push(fn)
+}
+
 function _Validator (key, value) {
-  this.stop = false
-  this.tasks = []
   this.key = key
   this.value = value
+
+  this.stop = false
+  this.tasks = []
   this.result = {
     valid: true,
     message: ''
   }
-  
-  let self = this
-  setTimeout(function () {
-    self.next()
-  }, 0)
 }
 
 _Validator.prototype.next = function () {
   var fn = this.tasks.shift()
   if (fn) {
-    fn()  
+    fn()
   } else {
-    console.log('last fn')
-    console.log(this.result)
     return this.result
   }
+}
+
+_Validator.prototype.done = function () {
+  this.next()
 }
 
 _Validator.prototype.setResult = function (message) {
@@ -42,7 +58,6 @@ _Validator.prototype.required = function () {
   var self = this
   var fn = (function () {
     return function () {
-      console.log('required')
       if (!self.value) {
         var message = self.key + ' is required'
         self.setResult(message)
@@ -58,80 +73,25 @@ _Validator.prototype.required = function () {
 }
 
 _Validator.prototype.string = function () {
-  var self = this
-  var fn = (function () {
-    return function () {
-      if (!self.stop) {
-        if (!judgeType(self.value)('string')) {
-          var message = self.key + ' should be a string'
-          self.setResult(message)
-        }
-      }
-
-      self.next()
-    }
-  }())
+  typeHandler(this, 'string')
   
-  this.tasks.push(fn)
   return this
 }
 
 _Validator.prototype.bool = function () {
-  var self = this
-  var fn = (function () {
-    return function () {
-      if (!self.stop) {
-        if (!judgeType(self.value)('boolean')) {
-          var message = self.key + ' should be a boolean'
-          self.setResult(message)
-        }
-      }
-
-      self.next()
-    }
-  }())
-  
-  this.tasks.push(fn)
+  typeHandler(this, 'boolean')
 
   return this
 }
 
 _Validator.prototype.number = function () {
-  var self = this
-  var fn = (function () {
-    return function () {
-      if (!self.stop) {
-        if (!judgeType(self.value)('number')) {
-          var message = self.key + ' should be a number'
-          self.setResult(message)
-        }
-      }
-
-      self.next()
-    }
-  }())
-  
-  this.tasks.push(fn)
+  typeHandler(this, 'number')
 
   return this
 }
 
 _Validator.prototype.array = function () {
-  var self = this
-  var fn = (function () {
-    return function () {
-      if (!self.stop) {
-        if (!judgeType(self.value)('array')) {
-          var message = self.key + ' should be an array'
-          self.setResult(message)
-        }
-      }
-
-      self.next()
-    }
-  }())
-  
-  this.tasks.push(fn)
+  typeHandler(this, 'array')
 
   return this
 }
@@ -212,7 +172,7 @@ _Validator.prototype.regex = function (reg) {
         if (!self.stop) {
           var checkReg = new RegExp(reg)
           if (!checkReg.test(self.value)) {
-            var message = self.key + ' with value ' + self.value + ' fails to macth the pattern ' + checkReg
+            var message = self.key + ' with value ' + self.value + ' fails to match the pattern ' + checkReg
             self.setResult(message)
           }
         }

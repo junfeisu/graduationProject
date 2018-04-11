@@ -9,7 +9,6 @@ const userSchema = new Schema({
   },
   user_id: {
     type: Number,
-    required: true,
     unique: true
   },
   phone: {
@@ -33,6 +32,8 @@ const userSchema = new Schema({
     required: [true, '密码不能为空']
   }
 }, {versionKey: false})
+
+userSchema.index({username: 1, phone: 1}, {unique: true})
 
 userSchema.pre('save', function (next) {
   var that = this
