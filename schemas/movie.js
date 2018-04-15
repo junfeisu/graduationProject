@@ -10,7 +10,6 @@ const movieSchema = new Schema({
   },
   movie_id: {
     type: Number,
-    require: true,
     unique: true
   },
   duration: {
@@ -42,5 +41,3 @@ movieSchema.pre('save', function (next) {
 })
 
 module.exports = mongoose.model('Movie', movieSchema)
-
-

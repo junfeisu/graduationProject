@@ -7,6 +7,7 @@ const app = express()
 const mongoose = require('mongoose')
 const connect = require('./utils/connect')
 const userAPI = require('./routes/user')
+const movieAPI = require('./routes/movie')
 
 app.use(logger('dev'))
 app.use(bodyParser.json())
@@ -16,6 +17,7 @@ app.use(express.static(path.join(__dirname, 'static/dist/')))
 
 // API
 app.use('/api/user', userAPI)
+app.use('/api/movie', movieAPI)
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found')
