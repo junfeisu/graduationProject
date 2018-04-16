@@ -3,9 +3,8 @@ const Schema = mongose.Schema
 const cinemaGenerate = require('./sequence').cinema
 
 const cinemaSchema = new Schema({
-  cniema_id: {
+  cinema_id: {
     type: Number,
-    required: true,
     unique: true
   },
   adress: {
@@ -22,19 +21,25 @@ const cinemaSchema = new Schema({
     type: Number,
     default: 5.0
   },
-  seats: [{
-    seat_row: {
+  screeningRooms: [{
+    room_id: {
       type: Number,
       required: true
     },
-    seat_column: {
-      type: Number,
-      required: true
-    },
-    saled: {
-      type: Boolean,
-      default: false
-    }
+    seats: [{
+      seat_row: {
+        type: Number,
+        required: true
+      },
+      seat_column: {
+        type: Number,
+        required: true
+      },
+      saled: {
+        type: Boolean,
+        default: false
+      }
+    }]
   }]
 }, {versionKey: false})
 
@@ -46,7 +51,7 @@ cinemaSchema.pre('save', function (next) {
         console.log('err is ' + JSON.stringify(err))
       } else {
         console.log('res is ' + JSON.stringify(res))
-        that.cniema_id = res.value.next
+        that.cinema_id = res.value.next
         next()
       }
     })
