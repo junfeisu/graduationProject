@@ -8,6 +8,8 @@ const mongoose = require('mongoose')
 const connect = require('./utils/connect')
 const userAPI = require('./routes/user')
 const movieAPI = require('./routes/movie')
+const cinemaAPI = require('./routes/cinema')
+const arrangeAPI = require('./routes/arrange')
 
 app.use(logger('dev'))
 app.use(bodyParser.json())
@@ -18,6 +20,8 @@ app.use(express.static(path.join(__dirname, 'static/dist/')))
 // API
 app.use('/api/user', userAPI)
 app.use('/api/movie', movieAPI)
+app.use('/api/cinema', cinemaAPI)
+app.use('/api/arrange', arrangeAPI)
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found')

@@ -26,7 +26,8 @@ route.post('/update', (req, res) => {
     })
   } else {
     res.status(400).json({
-      status: 
+      status: 'Fail',
+      message: 'cinema_is is necessary'
     })
   }
 })

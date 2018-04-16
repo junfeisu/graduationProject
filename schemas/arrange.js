@@ -5,8 +5,7 @@ const arrangeGenerate = require('./sequence').arrange
 const arrangeSchema = new Schema({
   arrange_id: {
     type: Number,
-    unique: true,
-    required: true
+    unique: true
   },
   movie_id: {
     type: Number,
@@ -29,6 +28,8 @@ const arrangeSchema = new Schema({
     required: true
   }
 }, {versionKey: false})
+
+arrangeSchema.index({movie_id: 1, cinema_id: 1, time: -1, room_id: 1}, {unique: true})
 
 arrangeSchema.pre('save', function (next) {
   var that = this
