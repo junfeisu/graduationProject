@@ -1,77 +1,101 @@
-const express = require('express')
-const route = express.Router()
+const Boom = require('boom')
+const Joi = require('joi')
 const userModel = require('../schemas/user')
-const Validate = require('../models/validate')
 
-// register
-route.post('/add', (req, res) => {
-  const { username, password, phone } = req.body
-  if (username && password && phone) {
+const addUser = {
+  method: 'POST',
+  path: '/user/add',
+  config: {
+    validate: {
+      payload: {
+        username: Joi.string().min(1).required(),
+        password: Joi.string().min(6).max(15).required(),
+        phone: Joi.string().regex(/^1\d{10}$/).required()
+      }
+    }
+  },
+  handler: (req, reply) => {
     new userModel(req.body).save((err, user) => {
       if (err) {
-        res.status(500).json(err)
+        reply(Boom.badImplementation(err.message))
       } else {
-        res.json(user)
+        delete result._doc.password
+        delete result._doc._id
+        reply({
+          status: 1,
+          data: result._doc
+        })
       }
     })
-  } else {
-    res.status(400).json({
-      status: 'Fail',
-      message: '用户名，密码，手机号不能为空'
-    })    
   }
-})
+}
 
-// login
-route.post('/login', (req, res) => {
-  const { username, password } = req.body
-  if (username && password) {
-    userModel.findOne({username: username}, function (err, user) {
+const userLogin = {
+  method: 'POST',
+  path: '/user/login',
+  config: {
+    validate: {
+      payload: {
+        username: Joi.string().min(1).required(),
+        password: Joi.string().min(6).max(15).required()
+      }
+    }
+  },
+  handler: (req, res) => {
+    const { username, password } = req.payload
+
+    userModel.find({username: username}, function (err, result.length) {
       if (err) {
-        res.status(500).json(err)
+        reply(Boom.badImplementation(err.message))
       } else {
-        if (user) {
-          user.password === password ? 
-            res.json({
-              status: 'OK',
-              message: '登录成功'
-            }) :
-            res.status(400).json({
-              status: 'Fail',
-              password: '密码不正确'
-            })
+        if (result.length) {
+          for (let i = 0, userLen = result.length; i < userLen; i++) {
+            if (result[i].password === password) {
+              delete result[i]._doc.password
+              delete result[i]._doc._id
+              reply({status: 0, data: result[i]._doc})
+              return
+            }
+          }
+          reply(Boom.badRequest('密码不正确'))
         } else {
-          res.status(400).json({
-            status: 'Fail',
-            message: '账号不存在'
-          })
+          reply(Boom.badRequest('用户名不存在'))
         }
       }
     })
-  } else {
-    res.status(400).json({
-      status: 'Fail',
-      message: '用户名和密码不能为空'
-    })
   }
-})
+}
 
-// update info
-route.post('/update', (req, res) => {
-  if (req.body.user_id) {
-    userModel.findOneAndUpdate({user_id: req.body.user_id}, {$set: req.body.userInfo}, function (err, user) {
+const updatePassword = {
+  method: 'POST',
+  path: '/user/updatePasssword',
+  config: {
+    validate: {
+      payload: {
+        user_id: Joi.number().integer().min(1).required(),
+        oldPassword: Joi.string().min(6).max(15).required(),
+        newPassword: Joi.string().min(6).max(15).required()
+      }
+    }
+  },
+  handler: (req, reply) => {
+    const { user_id, oldPassword, newPassword } = req.payload
+    let searchInfo = {
+      user_id: user_id,
+      password: oldPassword
+    }
+    if (oldPassword === newPassword) {
+      reply(Boom.badRequest('新旧密码不能相同'))
+    } else {
+      userModel.findOneAndUpdate(searchInfo, {$set: {password: newPassword}, function (err, user) {
       if (err) {
-        res.status(500).json(err)
+        reply(Boom.badImplementation(err.message))
       } else {
-        user ? res.json({status: 'OK', message: '修改信息成功'}) : res.json({status: 'Fail', message: '用户不存在'})
+        user ? reply({status: 1, message: '修改密码成功，请重新登录'}) : reply(Boom.badRequest('旧密码不正确'))
       }
     })
-  } else {
-    res.status(400).json({
-      status: 'Fail',
-      message: 'user_id can not be null'
-    })
+    }
   }
-})
+}
 
-module.exports = route
+module.exports = [addUser, userLogin, updatePasssword]

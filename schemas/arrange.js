@@ -7,13 +7,15 @@ const arrangeSchema = new Schema({
     type: Number,
     unique: true
   },
-  movie_id: {
+  movie: {
     type: Number,
-    required: true
+    required: true,
+    ref: 'Movie'
   },
-  cinema_id: {
+  cinema: {
     type: Number,
-    required: true
+    required: true,
+    ref: 'Cinema'
   },
   time: {
     type: Date,
@@ -23,13 +25,13 @@ const arrangeSchema = new Schema({
     type: Schema.Types.Decimal128,
     required: true
   },
-  room_id: {
+  room: {
     type: Number,
-    required: true
+    required: true,
   }
 }, {versionKey: false})
 
-arrangeSchema.index({movie_id: 1, cinema_id: 1, time: -1, room_id: 1}, {unique: true})
+arrangeSchema.index({movie: 1, cinema: 1, time: -1, room: 1}, {unique: true})
 
 arrangeSchema.pre('save', function (next) {
   var that = this

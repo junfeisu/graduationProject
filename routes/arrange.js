@@ -1,35 +1,48 @@
-const express = require('express')
-const route = express.Router()
+const Boom = require('boom')
+const Joi = require('joi')
 const arrangeModel = require('../schemas/arrange')
 
-// 添加电影播放安排
-route.post('/add', (req, res) => {
-  new arrangeModel(req.body).save(function (err, arrange) {
-    if (err) {
-      res.status(500).json(err)
-    } else {
-      res.json(arrange)
-    }
-  })
-})
+const addArragne = {
+  method: 'POST',
+  path: '/arrange/add',
+  config: {
+    validate: {
+      payload: {
 
-// 删除电影播放安排
-route.post('/delete', (req, res) => {
-  const { arrange_id } = req.body
-  if (arrange_id) {
+      }
+    }
+  },
+  handler: (req, reply) => {
+    new arrangeModel(req.body).save(function (err, arrange) {
+      if (err) {
+        reply(Boom.badImplementation(err.message))
+      } else {
+        reply({status: 1, data: arrange})
+      }
+    }) 
+  }
+}
+
+const deleteArrange = {
+  method: 'POST',
+  path: '/arrange/delete',
+  config: {
+    validate: {
+      payload: {
+
+      }
+    }
+  },
+  handler: (req, reply) => {
+    const { arrange_id } = req.body
     arrangeModel.remove({arrange_id: arrange_id}, function(err, result) {
       if (err) {
-        res.status(500).json(err)
+        reply(Boom.badImplementation(err.message))
       } else {
-        result.result.n ? res.json({status: 'OK', message: '删除成功'}) : res.json({status: 'Fail', message: '删除失败'})
+        result.result.n ? reply({status: 1, message: '删除成功'}) : reply({status: 0, message: '删除失败'})
       }
     })
-  } else {
-    res.status(400).json({
-      status: 'Fail',
-      message: 'arrange_id is necessary'
-    })
   }
-})
+}
 
-module.exports = route
+module.exports = [addArragne, deleteArrange]

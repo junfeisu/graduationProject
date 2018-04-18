@@ -5,15 +5,16 @@ const orderGenerate = require('./sequence').order
 const orderSchema = new Schema({
   order_id: {
     type: Number,
-    unique: true,
-    required: true
+    unique: true
   },
-  arrange_id: {
+  arrange: {
     type: Number,
+    ref: 'Arrange',
     rquired: true
   },
-  user_id: {
+  user: {
     type: Number,
+    ref: 'User',
     required: true
   },
   num: {
@@ -22,6 +23,8 @@ const orderSchema = new Schema({
   }
 })
 
+orderSchema.index({arrange_id: 1, user_id: 1}, {unique: true})
+
 orderSchema.pre('save', function (next) {
   var that = this
   if (this.isNew) {
@@ -29,7 +32,6 @@ orderSchema.pre('save', function (next) {
       if (err) {
         console.log('err is ' + JSON.stringify(err))
       } else {
-        console.log('res is ' + JSON.stringify(res))
         that.order_id = res.value.next
         next()
       }

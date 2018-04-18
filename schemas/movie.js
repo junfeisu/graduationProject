@@ -3,13 +3,13 @@ const Schema = mongoose.Schema
 const movieGenerate = require('./sequence').movie
 
 const movieSchema = new Schema({
+  movie_id: {
+    type: Number,
+    unique: true
+  },
   name: {
     type: String,
     required: true,
-    unique: true
-  },
-  movie_id: {
-    type: Number,
     unique: true
   },
   duration: {
