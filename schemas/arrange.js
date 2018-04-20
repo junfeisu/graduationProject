@@ -19,7 +19,7 @@ const arrangeSchema = new Schema({
   },
   time: {
     type: Date,
-    default: Date.now()
+    required: true
   },
   price: {
     type: Schema.Types.Decimal128,

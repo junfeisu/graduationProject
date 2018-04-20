@@ -8,12 +8,16 @@ const addArragne = {
   config: {
     validate: {
       payload: {
-
+        movie: Joi.number().integer().min(1).required(),
+        cinema: Joi.number().integer().min(1).required(),
+        time: Joi.date().required(),
+        price: Joi.number().min(0).required(),
+        room: Joi.number().min(1).required()
       }
     }
   },
   handler: (req, reply) => {
-    new arrangeModel(req.body).save(function (err, arrange) {
+    new arrangeModel(req.body).save((err, arrange) => {
       if (err) {
         reply(Boom.badImplementation(err.message))
       } else {
@@ -25,17 +29,17 @@ const addArragne = {
 
 const deleteArrange = {
   method: 'POST',
-  path: '/arrange/delete',
+  path: '/arrange/delete/{arrange_id}',
   config: {
     validate: {
-      payload: {
-
+      params: {
+        arrange_id: Joi.number().integer().min(1).required()
       }
     }
   },
   handler: (req, reply) => {
     const { arrange_id } = req.body
-    arrangeModel.remove({arrange_id: arrange_id}, function(err, result) {
+    arrangeModel.remove({arrange_id: arrange_id}, (err, result) => {
       if (err) {
         reply(Boom.badImplementation(err.message))
       } else {

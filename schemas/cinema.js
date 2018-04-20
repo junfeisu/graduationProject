@@ -17,10 +17,6 @@ const cinemaSchema = new Schema({
     required: true,
     unique: true
   },
-  evaluation: {
-    type: Number,
-    default: 5.0
-  },
   screeningRooms: [{
     room_id: {
       type: Number,

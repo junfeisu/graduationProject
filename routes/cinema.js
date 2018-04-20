@@ -1,54 +1,80 @@
-const express = require('express')
-const route = express.Router()
+const Boom = require('boom')
+const Joi = require('joi')
 const cinemaModel = require('../schemas/cinema')
 
 // 添加电影院
-route.post('/add', (req, res) => {
-  new cinemaModel(req.body).save((err, cinema) => {
-    if (err) {
-      res.status(500).json(err)
-    } else {
-      res.json(cinema)
+const addCinema = {
+  method: 'POST',
+  path: '/cinema/add',
+  config: {
+    validate: {
+      payload: {
+        address: Joi.string().min(1).required(),
+        contcat: Joi.string().required(),
+        screeningRooms: Joi.array().required()
+      }
     }
-  })
-})
+  },
+  handler: (req, reply) => {
+    new cinemaModel(req.body).save((err, cinema) => {
+      if (err) {
+        reply(Boom.badImplementation(err.message))
+      } else {
+        reply({status: 1, data: cinema})
+      }
+    })
+  }
+}
 
 // 修改电影院信息
-route.post('/update', (req, res) => {
-  const { cinema_id, cinemaInfo } = req.body
-  if (cinema_id) {
-    cinemaModel.findOneAndUpdate({cinema_id: cinema_id}, {$set: cinemaInfo}, {new: true}, function (err, cinema) {
+const upadteCinema = {
+  method: 'POST',
+  path: '/cinema/update/{cinema_id}',
+  config: {
+    validate: {
+      params: {
+        cinema_id: Joi.number().integer().min(1).required()
+      },
+      payload: {
+        address: Joi.string().min(1),
+        contcat: Joi.string(),
+        screeningRooms: Joi.array()
+      }
+    }
+  },
+  handler: (req, reply) => {
+    const { cinema_id, cinemaInfo } = req.body
+    cinemaModel.findOneAndUpdate({cinema_id: cinema_id}, {$set: cinemaInfo}, {new: true}, (err, cinema) => {
       if (err) {
-        res.status(500).json(err)
+        reply(Boom.badImplementation(err.message))
       } else {
-        cinema ? res.status(400).json({status: 'Fail', message: '修改信息失败'}) : res.json({status: 'OK', messgae: '修改信息成功', data: cinema})
+        cinema ? reply({status: 0, message: '修改信息失败', data: null}) : reply({status: 1, messgae: '修改信息成功', data: cinema})
       }
     })
-  } else {
-    res.status(400).json({
-      status: 'Fail',
-      message: 'cinema_is is necessary'
-    })
   }
-})
+}
 
 // 删除电影院
-route.post('/delete', (req, res) => {
-  const { cinema_id } = req.body
-  if (cinema_id) {
-    cinemaModel.remove({cinema_id: cinema_id}, function (err, result) {
+const deleteCinema = {
+  method: 'POST',
+  path: '/cinema/delete/{cinema_id}',
+  config: {
+    validate: {
+      params: {
+        cinema_id: Joi.number().integer().min(1).required()
+      }
+    }
+  },
+  handler: (req, reply) => {
+    const { cinema_id } = req.params
+    cinemaModel.remove({cinema_id: cinema_id}, (err, result) => {
       if (err) {
-        res.status(500).json(err)
+        reply(Boom.badImplementation(err.message))
       } else {
-        result.result.n ? res.json({status: 'OK', message: '删除成功'}) : res.json({status: 'Fail', message: '删除失败'})
+        result.result.n ? reply({status: 1, message: '删除成功'}) : reply({status: 0, message: '删除失败'})
       }
     })
-  } else {
-    res.status(400).json({
-      staus: 'Fail',
-      message: 'cinema_is is necessary'
-    })
   }
-})
+}
 
-module.exports = route
+module.exports = [addCinema, upadteCinema, deleteCinema]

@@ -44,7 +44,7 @@ const userLogin = {
   handler: (req, res) => {
     const { username, password } = req.payload
 
-    userModel.find({username: username}, function (err, result.length) {
+    userModel.find({username: username}, (err, result) => {
       if (err) {
         reply(Boom.badImplementation(err.message))
       } else {
@@ -68,7 +68,7 @@ const userLogin = {
 
 const updatePassword = {
   method: 'POST',
-  path: '/user/updatePasssword',
+  path: '/user/updatePassword',
   config: {
     validate: {
       payload: {
@@ -87,15 +87,15 @@ const updatePassword = {
     if (oldPassword === newPassword) {
       reply(Boom.badRequest('新旧密码不能相同'))
     } else {
-      userModel.findOneAndUpdate(searchInfo, {$set: {password: newPassword}, function (err, user) {
-      if (err) {
-        reply(Boom.badImplementation(err.message))
-      } else {
-        user ? reply({status: 1, message: '修改密码成功，请重新登录'}) : reply(Boom.badRequest('旧密码不正确'))
-      }
-    })
+      userModel.findOneAndUpdate(searchInfo, {$set: {password: newPassword}}, (err, user) => {
+        if (err) {
+          reply(Boom.badImplementation(err.message))
+        } else {
+          user ? reply({status: 1, message: '修改密码成功，请重新登录'}) : reply(Boom.badRequest('旧密码不正确'))
+        }
+      })
     }
   }
 }
 
-module.exports = [addUser, userLogin, updatePasssword]
+module.exports = [addUser, userLogin, updatePassword]

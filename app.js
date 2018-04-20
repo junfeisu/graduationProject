@@ -1,10 +1,13 @@
-const server = require('./server').server
+const server = require('./server')
 
-server.start(err => {
-  if (err) {
-    console.log('err is ' + err)
-    throw err
-  }
+const init = async () => {
+  await server.start()
+  console.log(`Server running at: ${server.info.uri}`)
+}
 
-  console.log('server is start at ' + server.info.uri)
+process.on('unhandledRejection', (err) => {
+  console.log(err.message)
+  process.exit(1)
 })
+
+init()

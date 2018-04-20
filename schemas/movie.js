@@ -3,41 +3,25 @@ const Schema = mongoose.Schema
 const movieGenerate = require('./sequence').movie
 
 const movieSchema = new Schema({
-  movie_id: {
-    type: Number,
-    unique: true
-  },
-  name: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  duration: {
-    type: String,
-    required: true
-  },
-  types: [String],
-  starring: [String],
-  director: [String],
-  desc: String,
-  area: String
+  _id: Number,
+  zh_name: String,
+  foreign_name: String,
+  image: String,
+  directors: [{}],
+  scenarists: [{}],
+  actors: [{}],
+  genres: [String],
+  initialReleaseDate: [String],
+  runtime: String,
+  imdb: {},
+  summary: String,
+  recommendations: [{}],
+  average: Number,
+  tags: [String],
+  language: [String],
+  region: [String],
+  aka: [String],
+  votes: Number
 }, {versionKey: false})
-
-movieSchema.pre('save', function (next) {
-  var that = this
-  if (this.isNew) {
-    movieGenerate.increase('MovieGenerate', function(err, res) {
-      if (err) {
-        console.log('err is' + JSON.stringify(err))
-      } else{
-        console.log('res is ' + JSON.stringify(res))
-        that.movie_id = res.value.next
-        next()
-      }
-    })
-  } else {
-    next()
-  }
-})
 
 module.exports = mongoose.model('Movie', movieSchema)

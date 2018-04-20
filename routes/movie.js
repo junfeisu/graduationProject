@@ -1,53 +1,78 @@
-const express = require('express')
-const route = express.Router()
+const Boom = require('boom')
+const Joi = require('joi')
 const movieModel = require('../schemas/movie')
 
 // 添加电影
-route.post('/add', (req, res) => {
-  new movieModel(req.body).save(function (err, movie) {
-    if (err) {
-      res.status(500).json(err)
-    } else {
-      res.json(movie)
+const addMovie = {
+  method: 'POST',
+  path: '/movie/add',
+  config: {
+    validate: {
+      payload: {
+        name: Joi.string().min(1).required(),
+        duration: Joi.string().min(1).required(),
+        types: Joi.array().required(),
+        starring: Joi.array().required(),
+        director: Joi.array().required(),
+        desc: Joi.string().min(10),
+        area: Joi.string()
+      }
     }
-  })
-})
+  },
+  handler: (req, reply) => {
+    new movieModel(req.body).save((err, movie) => {
+      if (err) {
+        reply(Boom.badImplementation(err.message))
+      } else {
+        reply({status: 1, data: movie})
+      }
+    })
+  }
+}
 
 // 修改电影信息
-route.post('/update', (req, res) => {
-  const { movie_id, movieInfo } = req.body
-  if (movie_id) {
-    movieModel.findOneAndUpdate({movie_id: movie_id}, {$set: movieInfo}, {new: true}, function (err, movie) {
+const updateMovie = {
+  method: 'POST',
+  path: '/movie/update',
+  config: {
+    validate: {
+      payload: {
+        movie_id: Joi.number().integer().min(1).required()
+      }
+    }
+  },
+  handler: (req, reply) => {
+    const { movie_id, movieInfo } = req.payload
+    movieModel.findOneAndUpdate({movie_id: movie_id}, {$set: movieInfo}, {new: true}, (err, movie) => {
       if (err) {
         res.status(500).json(err)
       } else {
-        movie ? res.json({status: 'OK', message: '修改成功', data: movie}) : res.json({status: 'Fail', message: '电影不存在', data: null})
+        movie ? reply({status: 1, message: '修改成功', data: movie}) : reply({status: 0, message: '电影不存在', data: null})
       }
     })
-  } else {
-    res.status(400).json({
-      status: 'Fail',
-      message: 'movie_id is necessary'
-    })
   }
-})
+}
 
 // 删除电影
-route.post('/delete', (req, res) => {
-  if (req.body.movie_id) {
-    movieModel.remove({movie_id: req.body.movie_id}, function (err, result) {
+const deleteMovie = {
+  method: 'POST',
+  path: '/movie/delete',
+  config: {
+    validate: {
+      payload: {
+        movie_id: Joi.number().integer().min(1).required()
+      }
+    }
+  },
+  handler: (req, reply) => {
+    movieModel.remove({movie_id: req.payload.movie_id}, (err, result) => {
       if (err) {
-        res.status(500).json(err)
+        reply(Boom.badImplementation(err.message))
       } else {
-        result.result.n ? res.json({status: 'OK', message: '删除成功'}) : res.json({status: 'Fail', message: '删除失败'})
+        result.result.n ? reply({status: 1, message: '删除成功'}) : reply({status: 0, message: '删除失败'})
       }
     })
-  } else {
-    res.status(400).json({
-      status: 'Fail',
-      message: 'movie_id is necessary'
-    })
   }
-})
+}
 
-module.exports = route
+module.exports = [addMovie, updateMovie, deleteMovie]
