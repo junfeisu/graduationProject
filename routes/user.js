@@ -15,7 +15,7 @@ const addUser = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        new userModel(req.body).save((err, user) => {
+        new userModel(req.payload).save((err, result) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {

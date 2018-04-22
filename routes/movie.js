@@ -20,7 +20,7 @@ const addMovie = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        new movieModel(req.body).save((err, movie) => {
+        new movieModel(req.payload).save((err, movie) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {

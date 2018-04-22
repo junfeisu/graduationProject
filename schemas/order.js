@@ -3,9 +3,8 @@ const Schema = mongoose.Schema
 const orderGenerate = require('./sequence').order
 
 const orderSchema = new Schema({
-  order_id: {
-    type: Number,
-    unique: true
+  _id: {
+    type: Number
   },
   arrange: {
     type: Number,
@@ -21,7 +20,7 @@ const orderSchema = new Schema({
     type: Number,
     default: 1
   }
-})
+}, {versionKey: false, _id: false})
 
 orderSchema.index({arrange_id: 1, user_id: 1}, {unique: true})
 
@@ -32,7 +31,7 @@ orderSchema.pre('save', function (next) {
       if (err) {
         console.log('err is ' + JSON.stringify(err))
       } else {
-        that.order_id = res.value.next
+        that._id = res.value.next
         next()
       }
     })

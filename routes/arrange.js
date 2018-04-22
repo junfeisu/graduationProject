@@ -17,13 +17,44 @@ const addArragne = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        new arrangeModel(req.body).save((err, arrange) => {
+        new arrangeModel(req.payload).save((err, arrange) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
             resolve({status: 1, data: arrange})
           }
         })
+      })
+    }
+  }
+}
+
+const getArranges = {
+  method: 'GET',
+  path: '/arrange',
+  options: {
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        arrangeModel.find()
+          .populate('cinema')
+          .exec((err, arranges) => {
+            if (err) {
+              reject(Boom.badImplementation(err.message))
+            } else {
+              if (arranges.length) {
+                arranges.forEach((arrange, index) => {
+                  arrange.populate({path: 'movie'}, (popErr, popDoc) => {
+                    arrange = popDoc
+                    if (index === arranges.length - 1) {
+                      resolve({status: 1, data: arranges})
+                    }
+                  })
+                })
+              } else {
+                resolve({status: 1, data: arranges})
+              }
+            }
+          })
       })
     }
   }
@@ -54,4 +85,4 @@ const deleteArrange = {
   }
 }
 
-module.exports = [addArragne, deleteArrange]
+module.exports = [addArragne, getArranges, deleteArrange]

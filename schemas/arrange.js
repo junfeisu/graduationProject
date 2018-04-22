@@ -3,9 +3,8 @@ const Schema = mongoose.Schema
 const arrangeGenerate = require('./sequence').arrange
 
 const arrangeSchema = new Schema({
-  arrange_id: {
-    type: Number,
-    unique: true
+  _id: {
+    type: Number
   },
   movie: {
     type: Number,
@@ -22,14 +21,14 @@ const arrangeSchema = new Schema({
     required: true
   },
   price: {
-    type: Schema.Types.Decimal128,
+    type: Number,
     required: true
   },
   room: {
     type: Number,
     required: true,
   }
-}, {versionKey: false})
+}, {versionKey: false, _id: false})
 
 arrangeSchema.index({movie: 1, cinema: 1, time: -1, room: 1}, {unique: true})
 
@@ -41,7 +40,7 @@ arrangeSchema.pre('save', function (next) {
         console.log('err is ' + JSON.stringify(err))
       } else {
         console.log('res is ' + JSON.stringify(res))
-        that.arrange_id = res.value.next
+        that._id = res.value.next
         next()
       }
     })

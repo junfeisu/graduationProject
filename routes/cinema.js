@@ -10,13 +10,14 @@ const addCinema = {
     validate: {
       payload: {
         address: Joi.string().min(1).required(),
-        contcat: Joi.string().required(),
+        contact: Joi.string().required(),
         screeningRooms: Joi.array().required()
       }
     },
     handler: (req, reply) => {
+      console.log('add cinema')
       return new Promise((resolve, reject) => {
-        new cinemaModel(req.body).save((err, cinema) => {
+        new cinemaModel(req.payload).save((err, cinema) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {

@@ -3,11 +3,10 @@ const Schema = mongoose.Schema
 const cinemaGenerate = require('./sequence').cinema
 
 const cinemaSchema = new Schema({
-  cinema_id: {
-    type: Number,
-    unique: true
+  _id: {
+    type: Number
   },
-  adress: {
+  address: {
     type: String,
     required: true,
     unique: true
@@ -37,7 +36,7 @@ const cinemaSchema = new Schema({
       }
     }]
   }]
-}, {versionKey: false})
+}, {versionKey: false, _id: false})
 
 cinemaSchema.pre('save', function (next) {
   var that = this
@@ -47,7 +46,7 @@ cinemaSchema.pre('save', function (next) {
         console.log('err is ' + JSON.stringify(err))
       } else {
         console.log('res is ' + JSON.stringify(res))
-        that.cinema_id = res.value.next
+        that._id = res.value.next
         next()
       }
     })

@@ -27,7 +27,7 @@ const addOrder = {
   }
 }
 
-const getOrder = {
+const getOrders = {
   method: 'GET',
   path: '/order/{user_id}',
   options: {
@@ -73,4 +73,4 @@ const deleteOrder = {
   }
 }
 
-module.exports = [addOrder, getOrder, deleteOrder]
+module.exports = [addOrder, getOrders, deleteOrder]
