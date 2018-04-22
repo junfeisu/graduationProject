@@ -47,7 +47,7 @@ const upadteCinema = {
     handler: (req, reply) => {
       const { cinema_id, cinemaInfo } = req.body
       return new Promise((resolve, reject) => {
-        cinemaModel.findOneAndUpdate({cinema_id: cinema_id}, {$set: cinemaInfo}, {new: true}, (err, cinema) => {
+        cinemaModel.findOneAndUpdate({_id: cinema_id}, {$set: cinemaInfo}, {new: true}, (err, cinema) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
@@ -72,7 +72,7 @@ const deleteCinema = {
     handler: (req, reply) => {
       const { cinema_id } = req.params
       return new Promise((resolve, reject) => {
-        cinemaModel.remove({cinema_id: cinema_id}, (err, result) => {
+        cinemaModel.remove({_id: cinema_id}, (err, result) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {

@@ -7,9 +7,8 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
-  user_id: {
-    type: Number,
-    unique: true
+  _id: {
+    type: Number
   },
   phone: {
     type: String,
@@ -31,7 +30,7 @@ const userSchema = new Schema({
     },
     required: [true, '密码不能为空']
   }
-}, {versionKey: false})
+}, {versionKey: false, _id: false})
 
 userSchema.index({username: 1, phone: 1}, {unique: true})
 
@@ -43,7 +42,7 @@ userSchema.pre('save', function (next) {
         console.log('err is' + JSON.stringify(err))
       } else{
         console.log('res is ' + JSON.stringify(res))
-        that.user_id = res.value.next
+        that._id = res.value.next
         next()
       }
     })

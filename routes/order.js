@@ -38,7 +38,7 @@ const getOrders = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        orderModel.find({user_id: req.params.user_id}, (err, result) => {
+        orderModel.find({user: req.params.user_id}, (err, result) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
@@ -61,7 +61,7 @@ const deleteOrder = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        orderModel.remove({order_id: req.params.order_id}, (err, result) => {
+        orderModel.remove({_id: req.params.order_id}, (err, result) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {

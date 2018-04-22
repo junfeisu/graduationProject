@@ -68,7 +68,7 @@ const updateMovie = {
     handler: (req, reply) => {
       const { movie_id, movieInfo } = req.payload
       return new Promise((resolve, reject) => {
-        movieModel.findOneAndUpdate({movie_id: movie_id}, {$set: movieInfo}, {new: true}, (err, movie) => {
+        movieModel.findOneAndUpdate({_id: movie_id}, {$set: movieInfo}, {new: true}, (err, movie) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
@@ -92,7 +92,7 @@ const deleteMovie = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        movieModel.remove({movie_id: req.payload.movie_id}, (err, result) => {
+        movieModel.remove({_id: req.payload.movie_id}, (err, result) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {

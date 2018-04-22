@@ -73,7 +73,7 @@ const deleteArrange = {
       const { arrange_id } = req.body
 
       return new Promise((resolve, reject) => {
-        arrangeModel.remove({arrange_id: arrange_id}, (err, result) => {
+        arrangeModel.remove({_id: arrange_id}, (err, result) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
