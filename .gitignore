@@ -3,7 +3,7 @@ yarn.lock
 yarn.error.*
 npm-debug.*
 static/yarn.lock
-static/yarn.error.*
+static/yarn-error.*
 static/npm-debug.*
 
 # node_modules

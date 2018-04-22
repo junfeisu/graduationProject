@@ -6,23 +6,25 @@ const cinemaModel = require('../schemas/cinema')
 const addCinema = {
   method: 'POST',
   path: '/cinema/add',
-  config: {
+  options: {
     validate: {
       payload: {
         address: Joi.string().min(1).required(),
         contcat: Joi.string().required(),
         screeningRooms: Joi.array().required()
       }
+    },
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        new cinemaModel(req.body).save((err, cinema) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            resolve({status: 1, data: cinema})
+          }
+        })
+      })
     }
-  },
-  handler: (req, reply) => {
-    new cinemaModel(req.body).save((err, cinema) => {
-      if (err) {
-        reply(Boom.badImplementation(err.message))
-      } else {
-        reply({status: 1, data: cinema})
-      }
-    })
   }
 }
 
@@ -30,7 +32,7 @@ const addCinema = {
 const upadteCinema = {
   method: 'POST',
   path: '/cinema/update/{cinema_id}',
-  config: {
+  options: {
     validate: {
       params: {
         cinema_id: Joi.number().integer().min(1).required()
@@ -40,17 +42,19 @@ const upadteCinema = {
         contcat: Joi.string(),
         screeningRooms: Joi.array()
       }
+    },
+    handler: (req, reply) => {
+      const { cinema_id, cinemaInfo } = req.body
+      return new Promise((resolve, reject) => {
+        cinemaModel.findOneAndUpdate({cinema_id: cinema_id}, {$set: cinemaInfo}, {new: true}, (err, cinema) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            cinema ? resolve({status: 1, messgae: '修改信息成功', data: cinema}) : resolve({status: 0, message: '修改信息失败', data: null})
+          }
+        })
+      })
     }
-  },
-  handler: (req, reply) => {
-    const { cinema_id, cinemaInfo } = req.body
-    cinemaModel.findOneAndUpdate({cinema_id: cinema_id}, {$set: cinemaInfo}, {new: true}, (err, cinema) => {
-      if (err) {
-        reply(Boom.badImplementation(err.message))
-      } else {
-        cinema ? reply({status: 0, message: '修改信息失败', data: null}) : reply({status: 1, messgae: '修改信息成功', data: cinema})
-      }
-    })
   }
 }
 
@@ -58,22 +62,24 @@ const upadteCinema = {
 const deleteCinema = {
   method: 'POST',
   path: '/cinema/delete/{cinema_id}',
-  config: {
+  options: {
     validate: {
       params: {
         cinema_id: Joi.number().integer().min(1).required()
       }
+    },
+    handler: (req, reply) => {
+      const { cinema_id } = req.params
+      return new Promise((resolve, reject) => {
+        cinemaModel.remove({cinema_id: cinema_id}, (err, result) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            result.result.n ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
+          }
+        })
+      })
     }
-  },
-  handler: (req, reply) => {
-    const { cinema_id } = req.params
-    cinemaModel.remove({cinema_id: cinema_id}, (err, result) => {
-      if (err) {
-        reply(Boom.badImplementation(err.message))
-      } else {
-        result.result.n ? reply({status: 1, message: '删除成功'}) : reply({status: 0, message: '删除失败'})
-      }
-    })
   }
 }
 

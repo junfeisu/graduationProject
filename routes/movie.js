@@ -6,7 +6,7 @@ const movieModel = require('../schemas/movie')
 const addMovie = {
   method: 'POST',
   path: '/movie/add',
-  config: {
+  options: {
     validate: {
       payload: {
         name: Joi.string().min(1).required(),
@@ -17,16 +17,41 @@ const addMovie = {
         desc: Joi.string().min(10),
         area: Joi.string()
       }
+    },
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        new movieModel(req.body).save((err, movie) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            resolve({status: 1, data: movie})
+          }
+        })
+      })
     }
-  },
-  handler: (req, reply) => {
-    new movieModel(req.body).save((err, movie) => {
-      if (err) {
-        reply(Boom.badImplementation(err.message))
-      } else {
-        reply({status: 1, data: movie})
+  }
+}
+
+const getMovie = {
+  method: 'GET',
+  path: '/movie/{movieId}',
+  options: {
+    validate: {
+      params: {
+        movieId: Joi.number().integer().min(1).required()
       }
-    })
+    },
+    handler: (req, h) => {
+      return new Promise((resolve, reject) => {
+        movieModel.findOne({_id: req.params.movieId}, (err, movie) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            resolve({status: 1, data: movie})
+          }
+        })
+      })
+    }
   }
 }
 
@@ -34,22 +59,24 @@ const addMovie = {
 const updateMovie = {
   method: 'POST',
   path: '/movie/update',
-  config: {
+  options: {
     validate: {
       payload: {
         movie_id: Joi.number().integer().min(1).required()
       }
+    },
+    handler: (req, reply) => {
+      const { movie_id, movieInfo } = req.payload
+      return new Promise((resolve, reject) => {
+        movieModel.findOneAndUpdate({movie_id: movie_id}, {$set: movieInfo}, {new: true}, (err, movie) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            movie ? resolve({status: 1, message: '修改成功', data: movie}) : resolve({status: 0, message: '电影不存在', data: null})
+          }
+        })
+      })
     }
-  },
-  handler: (req, reply) => {
-    const { movie_id, movieInfo } = req.payload
-    movieModel.findOneAndUpdate({movie_id: movie_id}, {$set: movieInfo}, {new: true}, (err, movie) => {
-      if (err) {
-        res.status(500).json(err)
-      } else {
-        movie ? reply({status: 1, message: '修改成功', data: movie}) : reply({status: 0, message: '电影不存在', data: null})
-      }
-    })
   }
 }
 
@@ -57,22 +84,24 @@ const updateMovie = {
 const deleteMovie = {
   method: 'POST',
   path: '/movie/delete',
-  config: {
+  options: {
     validate: {
       payload: {
         movie_id: Joi.number().integer().min(1).required()
       }
+    },
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        movieModel.remove({movie_id: req.payload.movie_id}, (err, result) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            result.result.n ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
+          }
+        })
+      })
     }
-  },
-  handler: (req, reply) => {
-    movieModel.remove({movie_id: req.payload.movie_id}, (err, result) => {
-      if (err) {
-        reply(Boom.badImplementation(err.message))
-      } else {
-        result.result.n ? reply({status: 1, message: '删除成功'}) : reply({status: 0, message: '删除失败'})
-      }
-    })
   }
 }
 
-module.exports = [addMovie, updateMovie, deleteMovie]
+module.exports = [addMovie, getMovie, updateMovie, deleteMovie]

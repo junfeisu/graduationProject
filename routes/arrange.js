@@ -5,7 +5,7 @@ const arrangeModel = require('../schemas/arrange')
 const addArragne = {
   method: 'POST',
   path: '/arrange/add',
-  config: {
+  options: {
     validate: {
       payload: {
         movie: Joi.number().integer().min(1).required(),
@@ -14,38 +14,43 @@ const addArragne = {
         price: Joi.number().min(0).required(),
         room: Joi.number().min(1).required()
       }
+    },
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        new arrangeModel(req.body).save((err, arrange) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            resolve({status: 1, data: arrange})
+          }
+        })
+      })
     }
-  },
-  handler: (req, reply) => {
-    new arrangeModel(req.body).save((err, arrange) => {
-      if (err) {
-        reply(Boom.badImplementation(err.message))
-      } else {
-        reply({status: 1, data: arrange})
-      }
-    }) 
   }
 }
 
 const deleteArrange = {
   method: 'POST',
   path: '/arrange/delete/{arrange_id}',
-  config: {
+  options: {
     validate: {
       params: {
         arrange_id: Joi.number().integer().min(1).required()
       }
+    },
+    handler: (req, reply) => {
+      const { arrange_id } = req.body
+
+      return new Promise((resolve, reject) => {
+        arrangeModel.remove({arrange_id: arrange_id}, (err, result) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            result.result.n ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
+          }
+        })
+      })
     }
-  },
-  handler: (req, reply) => {
-    const { arrange_id } = req.body
-    arrangeModel.remove({arrange_id: arrange_id}, (err, result) => {
-      if (err) {
-        reply(Boom.badImplementation(err.message))
-      } else {
-        result.result.n ? reply({status: 1, message: '删除成功'}) : reply({status: 0, message: '删除失败'})
-      }
-    })
   }
 }
 

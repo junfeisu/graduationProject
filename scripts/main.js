@@ -41,6 +41,7 @@ function getLink(url) {
 }
 
 function save(movie, $) {
+    console.log(movie)
     MovieModel.findOne({ _id: movie._id }, function(err, res) {
         if (err) {
             console.log('查找电影是否存在出错，错误内容为' + err.message)
