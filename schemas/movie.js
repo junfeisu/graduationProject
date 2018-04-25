@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const movieGenerate = require('./sequence').movie
 
 const movieSchema = new Schema({
   _id: Number,

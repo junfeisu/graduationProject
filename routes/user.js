@@ -52,13 +52,13 @@ const userLogin = {
                 if (result[i].password === password) {
                   delete result[i]._doc.password
                   delete result[i]._doc._id
-                  resolve({status: 0, data: result[i]._doc})
+                  resolve({status: 1, data: result[i]._doc})
                   return
                 }
               }
-              reject(Boom.badRequest('密码不正确'))
+              resolve(Boom.badRequest('密码不正确'))
             } else {
-              reject(Boom.badRequest('用户名不存在'))
+              resolve(Boom.badRequest('用户名不存在'))
             }
           }
         })
