@@ -30,12 +30,12 @@ const addArragne = {
 }
 
 const getArranges = {
-  method: 'GET',
-  path: '/arrange',
+  method: 'POST',
+  path: '/arrange/search',
   options: {
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        arrangeModel.find()
+        arrangeModel.find(req.payload)
           .populate('cinema')
           .exec((err, arranges) => {
             if (err) {
