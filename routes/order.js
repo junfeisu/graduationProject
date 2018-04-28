@@ -1,6 +1,7 @@
 const Boom = require('boom')
 const Joi = require('joi')
 const orderModel = require('../schemas/order')
+const arrangeModel = require('../schemas/arrange')
 
 const addOrder = {
   method: 'POST',
@@ -8,18 +9,32 @@ const addOrder = {
   options: {
     validate: {
       payload: {
-        user_id: Joi.number().integer().min(1).required(),
-        arrange_id: Joi.number().integer().min(1).required(),
-        num: Joi.number().integer().min(1).required()
+        user: Joi.number().integer().min(1).required(),
+        arrange: Joi.number().integer().min(1).required(),
+        num: Joi.number().integer().min(1).required(),
+        room: Joi.array().required()
       }
     },
     handler: (req, reply) => {
+      const { arrange, room } = req.payload
+
       return new Promise((resolve, reject) => {
-        new orderModel(reply.payload).save((err, order) => {
-          if (err) {
+        arrangeModel.findOneAndUpdate({_id: arrange}, {$set: {room: room}}, (findErr, findRes) => {
+          if (findErr) {
             reject(Boom.badImplementation(err.message))
           } else {
-            resolve({status: 1, data: order})
+            if (findRes) {
+              delete req.payload.room
+              new orderModel(req.payload).save((err, order) => {
+                if (err) {
+                  reject(Boom.badImplementation(err.message))
+                } else {
+                  resolve({status: 1, data: order})
+                }
+              })
+            } else {
+              reject({status: 0, data: null, message: '该场电影安排已经下线或者过期'})
+            }
           }
         })
       })

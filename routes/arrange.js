@@ -11,8 +11,7 @@ const addArragne = {
         movie: Joi.number().integer().min(1).required(),
         cinema: Joi.number().integer().min(1).required(),
         time: Joi.date().required(),
-        price: Joi.number().min(0).required(),
-        room: Joi.number().min(1).required()
+        price: Joi.number().min(0).required()
       }
     },
     handler: (req, reply) => {

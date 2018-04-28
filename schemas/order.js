@@ -22,7 +22,7 @@ const orderSchema = new Schema({
   }
 }, {versionKey: false, _id: false})
 
-orderSchema.index({arrange_id: 1, user_id: 1}, {unique: true})
+orderSchema.index({_id: 1, user_id: 1}, {unique: true})
 
 orderSchema.pre('save', function (next) {
   var that = this
