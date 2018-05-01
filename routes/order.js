@@ -53,11 +53,30 @@ const getOrders = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        orderModel.find({user: req.params.user_id}, (err, result) => {
+        orderModel.find({user: req.params.user_id}, (err, orders) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
-            resolve({status: 1, data: result})
+            if (orders.length) {
+              orders.forEach((val, index) => {
+                arrangeModel.findOne({_id: val.arrange})
+                  .populate('cinema')
+                  .exec((err, arrange) => {
+                    if (err) {
+                      reject(Boom.badImplementation(err.message))
+                    } else {
+                      arrange.populate({path: 'movie'}, (popErr, popDoc) => {
+                        val.arrange = popDoc
+                        if (index === orders.length - 1) {
+                          resolve({status: 1, data: orders})
+                        }
+                      })
+                    }
+                  })
+              })
+            } else {
+              resolve({status: 1, data: orders})
+            }
           }
         })
       })
