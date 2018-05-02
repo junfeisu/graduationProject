@@ -60,14 +60,24 @@ const getOrders = {
             if (orders.length) {
               orders.forEach((val, index) => {
                 arrangeModel.findOne({_id: val.arrange})
-                  .populate('cinema')
                   .exec((err, arrange) => {
                     if (err) {
                       reject(Boom.badImplementation(err.message))
                     } else {
                       arrange.populate({path: 'movie'}, (popErr, popDoc) => {
+                        let finish = true
+
                         val.arrange = popDoc
-                        if (index === orders.length - 1) {
+                        val.finish = true
+
+                        for (var i = 0; i < orders.length; i++) {
+                          if (!orders[i].finish) {
+                            finish = false
+                            break
+                          }
+                        }
+
+                        if (finish) {
                           resolve({status: 1, data: orders})
                         }
                       })
