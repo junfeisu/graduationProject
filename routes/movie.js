@@ -2,6 +2,24 @@ const Boom = require('boom')
 const Joi = require('joi')
 const movieModel = require('../schemas/movie')
 
+const getPlayingMovies = {
+  method: 'GET',
+  path: '/movie/playing',
+  options: {
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        movieModel.aggregate([{$match: {}}, {$limit: 4}], (err, playingMovies) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            resolve({status: 1, data: playingMovies})
+          }
+        })
+      })
+    }
+  }
+}
+
 // 添加电影
 const addMovie = {
   method: 'POST',
@@ -104,4 +122,4 @@ const deleteMovie = {
   }
 }
 
-module.exports = [addMovie, getMovie, updateMovie, deleteMovie]
+module.exports = [addMovie, getPlayingMovies, getMovie, updateMovie, deleteMovie]
