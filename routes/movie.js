@@ -135,11 +135,11 @@ const deleteMovie = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        movieModel.remove({_id: req.payload.movie_id}, (err, result) => {
+        movieModel.findOneAndRemove({_id: req.payload.movie_id}, (err, result) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
-            result.result.n ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
+            result ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
           }
         })
       })

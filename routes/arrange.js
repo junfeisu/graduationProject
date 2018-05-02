@@ -72,11 +72,11 @@ const deleteArrange = {
       const { arrange_id } = req.body
 
       return new Promise((resolve, reject) => {
-        arrangeModel.remove({_id: arrange_id}, (err, result) => {
+        arrangeModel.findOneAndRemove({_id: arrange_id}, (err, result) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
-            result.result.n ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
+            result ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
           }
         })
       })

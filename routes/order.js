@@ -105,11 +105,11 @@ const deleteOrder = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        orderModel.remove({_id: req.params.order_id}, (err, result) => {
+        orderModel.findOneAndRemove({_id: req.params.order_id}, (err, order) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
-            result.result.n ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
+            order ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
           }
         })
       })

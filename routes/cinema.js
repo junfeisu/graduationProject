@@ -72,11 +72,11 @@ const deleteCinema = {
     handler: (req, reply) => {
       const { cinema_id } = req.params
       return new Promise((resolve, reject) => {
-        cinemaModel.remove({_id: cinema_id}, (err, result) => {
+        cinemaModel.findOneAndRemove({_id: cinema_id}, (err, result) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
-            result.result.n ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
+            result ? resolve({status: 1, message: '删除成功'}) : resolve({status: 0, message: '删除失败'})
           }
         })
       })
