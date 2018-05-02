@@ -1,6 +1,8 @@
 const Boom = require('boom')
 const Joi = require('joi')
 const movieModel = require('../schemas/movie')
+const superagent = require('superagent')
+const requestHeader = require('../models/header')
 
 const getPlayingMovies = {
   method: 'GET',
@@ -15,6 +17,29 @@ const getPlayingMovies = {
             resolve({status: 1, data: playingMovies})
           }
         })
+      })
+    }
+  }
+}
+
+const getWillplayMovies = {
+  method: 'GET',
+  path: '/movie/come_soon',
+  options: {
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        superagent.options('https://api.douban.com/v2/movie/coming_soon')
+          .end((err, result) => {
+            if (err) {
+              reject(Boom.badImplementation(err.message))
+            } else {
+              if (result.body.count) {
+                resolve({status: 1, data: result.body.subjects.slice(0, 4)})
+              } else {
+                resolve({status: 1, data: []})
+              }
+            }
+          })
       })
     }
   }
@@ -122,4 +147,4 @@ const deleteMovie = {
   }
 }
 
-module.exports = [addMovie, getPlayingMovies, getMovie, updateMovie, deleteMovie]
+module.exports = [addMovie, getPlayingMovies, getWillplayMovies, getMovie, updateMovie, deleteMovie]
