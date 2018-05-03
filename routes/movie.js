@@ -4,6 +4,7 @@ const movieModel = require('../schemas/movie')
 const superagent = require('superagent')
 const requestHeader = require('../models/header')
 
+// 获取正在上映的电影
 const getPlayingMovies = {
   method: 'GET',
   path: '/movie/playing',
@@ -22,6 +23,7 @@ const getPlayingMovies = {
   }
 }
 
+// 获取即将上映的电影
 const getWillplayMovies = {
   method: 'GET',
   path: '/movie/come_soon',
@@ -75,6 +77,7 @@ const addMovie = {
   }
 }
 
+// 获取单个电影
 const getMovie = {
   method: 'GET',
   path: '/movie/{movieId}',
@@ -97,6 +100,49 @@ const getMovie = {
     }
   }
 }
+
+// 获取排名前十
+const getTopTenMovies = {
+  method: 'GET',
+  path: '/movie/top',
+  options: {
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        superagent.options('https://api.douban.com/v2/movie/top250')
+          .end((err, result) => {
+            if (err) {
+              reject(Boom.badImplementation(err.message))
+            } else {
+              resolve({status: 1, data: result.body.subjects.slice(0, 10)})
+            }
+          })
+      })
+    }
+  }
+}
+
+// 获取每周口碑最好的电影
+// const getPrasiedMovies = {
+//   method: 'GET',
+//   path: '/movie/praised',
+//   options: {
+//     handler: (req, reply) => {
+//       return new Promise((resolve, reject) => {
+//         superagent.get('https://api.douban.com/v2/movie/weekly')
+//           .set(requestHeader)
+//           .end((err, result) => {
+//             if (err) {
+//               console.log(err)
+//               reject(Boom.badImplementation(err.message))
+//             } else {
+//               console.log(result.body)
+//               // resolve({status: 1, data: result.body.})
+//             }
+//           })
+//       })
+//     }
+//   }
+// }
 
 // 修改电影信息
 const updateMovie = {
@@ -147,4 +193,12 @@ const deleteMovie = {
   }
 }
 
-module.exports = [addMovie, getPlayingMovies, getWillplayMovies, getMovie, updateMovie, deleteMovie]
+module.exports = [
+  addMovie,
+  getPlayingMovies,
+  getWillplayMovies,
+  getTopTenMovies,
+  getMovie,
+  updateMovie,
+  deleteMovie
+]
