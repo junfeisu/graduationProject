@@ -20,7 +20,6 @@ const addUser = {
             reject(Boom.badImplementation(err.message))
           } else {
             delete result._doc.password
-            delete result._doc._id
             resolve({ status: 1, data: result._doc})
           }
         })
