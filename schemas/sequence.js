@@ -41,6 +41,14 @@ const arrangeGenerateSchema = new Schema({
   }
 })
 
+const commentGenerateSchema = new Schema({
+  _id: String,
+  next: {
+    type: Number,
+    default: 1
+  }
+})
+
 function increase (schemaName, callback) {
   return this.collection.findOneAndUpdate(
     {'_id': schemaName},
@@ -55,11 +63,13 @@ movieGenerateSchema.statics.increase = increase
 cinemaGenerateSchema.statics.increase = increase
 orderGenerateSchema.statics.increase = increase
 arrangeGenerateSchema.statics.increase = increase
+commentGenerateSchema.statics.increase = increase
 
 module.exports = {
   user: mongoose.model('UserGenerate', userGenerateSchema),
   movie: mongoose.model('MovieGenerate', movieGenerateSchema),
   cinema: mongoose.model('CinemaGenerate', cinemaGenerateSchema),
   order: mongoose.model('OrderGenerate', orderGenerateSchema),
-  arrange: mongoose.model('ArrangeGenerate', arrangeGenerateSchema)
+  arrange: mongoose.model('ArrangeGenerate', arrangeGenerateSchema),
+  comment: mongoose.model('CommentGenerate', commentGenerateSchema)
 }

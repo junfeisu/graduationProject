@@ -10,6 +10,10 @@ const userSchema = new Schema({
   _id: {
     type: Number
   },
+  role: {
+    type: String,
+    default: 'normal'
+  },
   phone: {
     type: String,
     validate: {
