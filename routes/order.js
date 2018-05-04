@@ -42,6 +42,32 @@ const addOrder = {
   }
 }
 
+// const cancelOrder = {
+//   method: 'POST',
+//   path: '/order/cancel',
+//   options: {
+//     validate: {
+//       payload: {
+//         orderId: Joi.number().integer().min(1).required(),
+//         arrangeId: Joi.number().integer().min(1).required(),
+//         seats: Joi.array().required()
+//       }
+//     },
+//     handler: (req, reply) => {
+//       const { orderId, arrangeId, seats } = req.payload
+
+//       return new Promise((resolve, reject) => {
+//         arrangeModel.findOne({_id: arrangeId}, (findErr, arrange) {
+//           if (findErr) {
+//             reject()
+//           }
+//         })
+//         arrangeModel.findOneAndUpdate({_id: arrangeId}, {$set: {seats: seats}})
+//       })
+//     }
+//   }
+// }
+
 const getOrders = {
   method: 'GET',
   path: '/order/{user_id}',

@@ -19,6 +19,10 @@ const orderSchema = new Schema({
   num: {
     type: Number,
     default: 1
+  },
+  seats: {
+    type: Array,
+    required: true
   }
 }, {versionKey: false, _id: false})
 
