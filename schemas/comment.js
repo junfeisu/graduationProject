@@ -43,3 +43,5 @@ commentSchema.pre('save', function(next) {
         next()
     }
 })
+
+module.exports = mongoose.model('Comment', commentSchema)

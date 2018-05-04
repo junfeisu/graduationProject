@@ -3,5 +3,6 @@ module.exports = [
   require('./movie'),
   require('./cinema'),
   require('./arrange'),
-  require('./order')
+  require('./order'),
+  require('./comment')
 ]
