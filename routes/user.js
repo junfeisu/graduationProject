@@ -100,4 +100,27 @@ const updatePassword = {
   }
 }
 
+const deleteUser = {
+  method: 'POST',
+  path: '/user/delete/{userId}',
+  options: {
+    validate: {
+      params: {
+        userId: Joi.number().integer().min(1).required()
+      }
+    },
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        userModel.findOneAndRemove({_id: req.params.userId}, (err, user) => {
+          if (err) {
+
+          } else {
+            user ? resolve({status: 1, data: null, message: '删除用户成功'}) : resolve({status: 0, data: null, message: '删除用户失败'})
+          }
+        })
+      })
+    }
+  }
+}
+
 module.exports = [addUser, userLogin, updatePassword]

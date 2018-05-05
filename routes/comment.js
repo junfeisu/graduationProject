@@ -2,6 +2,29 @@ const Boom = require('boom')
 const Joi = require('joi')
 const commentModel = require('../schemas/comment')
 
+const getComments = {
+  path: '/comment/movie/{movieId}',
+  method: 'GET',
+  options: {
+    validate: {
+      params: {
+        movieId: Joi.number().integer().min(1).required()
+      }
+    },
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        commentModel.find({movie: req.params.movieId}, (err, comments) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            resolve({status: 1, data: comments})
+          }
+        })
+      })
+    }
+  }
+}
+
 const addComment = {
   path: '/comment/add',
   method: 'POST',
@@ -19,7 +42,7 @@ const addComment = {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
-            resole({status: 1, data: comment})
+            resolve({status: 1, data: comment})
           }
         })
       })
@@ -51,6 +74,7 @@ const deleteComment = {
 }
 
 module.exports = [
+  getComments,
   addComment,
   deleteComment
 ]
