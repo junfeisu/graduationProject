@@ -2,6 +2,8 @@ const Boom = require('boom')
 const Joi = require('joi')
 const orderModel = require('../schemas/order')
 const arrangeModel = require('../schemas/arrange')
+const Events = require('events')
+const roomUtils = require('../utils/roomUtils')
 
 const addOrder = {
   method: 'POST',
@@ -12,31 +14,33 @@ const addOrder = {
         user: Joi.number().integer().min(1).required(),
         arrange: Joi.number().integer().min(1).required(),
         num: Joi.number().integer().min(1).required(),
-        room: Joi.array().required()
+        seats: Joi.array().required()
       }
     },
     handler: (req, reply) => {
-      const { arrange, room } = req.payload
+      const { arrange, seats } = req.payload
+      const event = new Events()
 
       return new Promise((resolve, reject) => {
-        arrangeModel.findOneAndUpdate({_id: arrange}, {$set: {room: room}}, (findErr, findRes) => {
-          if (findErr) {
-            reject(Boom.badImplementation(err.message))
-          } else {
-            if (findRes) {
-              delete req.payload.room
-              new orderModel(req.payload).save((err, order) => {
-                if (err) {
-                  reject(Boom.badImplementation(err.message))
-                } else {
-                  resolve({status: 1, data: order})
-                }
-              })
-            } else {
-              reject({status: 0, data: null, message: '该场电影安排已经下线或者过期'})
-            }
-          }
+        event.on('Error', message => {
+          reject({status: 0, message: message})
         })
+
+        event.on('updateRoom', arrange => {
+          roomUtils.updateRoom(arrange, seats, event)
+        })
+
+        event.on('generateOrder', () => {
+          new orderModel(req.payload).save((err, order) => {
+              if (err) {
+                reject(Boom.badImplementation(err.message))
+              } else {
+                resolve({status: 1, data: order})
+              }
+          })
+        })
+        
+        roomUtils.findRoom(arrange, event)
       })
     }
   }

@@ -8,7 +8,8 @@ const commentSchema = new Schema({
   },
   comment_user: {
     type: Number,
-    required: true
+    required: true,
+    ref: 'User'
   },
   movie: {
     type: Number,

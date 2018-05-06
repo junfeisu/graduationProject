@@ -13,13 +13,15 @@ const getComments = {
     },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
-        commentModel.find({movie: req.params.movieId}, (err, comments) => {
-          if (err) {
-            reject(Boom.badImplementation(err.message))
-          } else {
-            resolve({status: 1, data: comments})
-          }
-        })
+        commentModel.find({movie: req.params.movieId})
+          .populate('comment_user')
+          .exec((err, comments) => {
+            if (err) {
+              reject(Boom.badImplementation(err.message))
+            } else {
+              resolve({status: 1, data: comments})
+            }
+          })
       })
     }
   }

@@ -50,7 +50,6 @@ const userLogin = {
               for (let i = 0, userLen = result.length; i < userLen; i++) {
                 if (result[i].password === password) {
                   delete result[i]._doc.password
-                  delete result[i]._doc._id
                   resolve({status: 1, data: result[i]._doc})
                   return
                 }
