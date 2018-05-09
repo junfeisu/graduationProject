@@ -10,7 +10,8 @@ const addUser = {
       payload: {
         username: Joi.string().min(1).required(),
         password: Joi.string().min(6).max(15).required(),
-        phone: Joi.string().regex(/^1\d{10}$/).required()
+        phone: Joi.string().regex(/^1\d{10}$/).required(),
+        role: Joi.string().regex(/^(admin|normal)$/)
       }
     },
     handler: (req, reply) => {
@@ -65,6 +66,27 @@ const userLogin = {
   }
 }
 
+const getUserList = {
+  method: 'GET',
+  path: '/user/list',
+  options: {
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        userModel.find((err, users) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            users.forEach(user => {
+              delete user._doc.password
+            })
+            resolve({status: 1, data: users})
+          }
+        })
+      })
+    }
+  }
+}
+
 const updatePassword = {
   method: 'POST',
   path: '/user/updatePassword',
@@ -99,6 +121,35 @@ const updatePassword = {
   }
 }
 
+const updateUserInfo = {
+  path: '/user/update',
+  method: 'POST',
+  options: {
+    validate: {
+      payload: {
+        _id: Joi.number().integer().min(1).required(),
+        username: Joi.string().min(1).required(),
+        phone: Joi.string().regex(/^1\d{10}$/).required(),
+        role: Joi.string().regex(/^(admin|normal)$/).required()
+      }
+    },
+    handler: (req, reply) => {
+      const { _id } = req.payload
+
+      delete req.payload._id
+      return new Promise((resolve, reject) => {
+        userModel.findOneAndUpdate({_id: _id}, {$set: req.payload}, {new: true}, (err, user) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            user ? resolve({status: 1, data: user}) : resovle({status: 0, data: user})
+          }
+        })
+      })
+    }
+  }
+}
+
 const deleteUser = {
   method: 'POST',
   path: '/user/delete/{userId}',
@@ -122,4 +173,4 @@ const deleteUser = {
   }
 }
 
-module.exports = [addUser, userLogin, updatePassword]
+module.exports = [addUser, userLogin, getUserList, updatePassword, updateUserInfo, deleteUser]

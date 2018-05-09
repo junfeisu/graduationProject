@@ -54,13 +54,14 @@ const addMovie = {
   options: {
     validate: {
       payload: {
-        name: Joi.string().min(1).required(),
-        duration: Joi.string().min(1).required(),
-        types: Joi.array().required(),
-        starring: Joi.array().required(),
-        director: Joi.array().required(),
-        desc: Joi.string().min(10),
-        area: Joi.string()
+        zh_name: Joi.string().min(1).required(),
+        runtime: Joi.string().min(1).required(),
+        genres: Joi.array().required(),
+        actors: Joi.array().required(),
+        directors: Joi.array().required(),
+        region: Joi.array().min(10),
+        language: Joi.string().min(1).required(),
+        image: Joi.string().regex(/^.*\.(jpg|jpeg|png|gif)$/i).required()
       }
     },
     handler: (req, reply) => {
