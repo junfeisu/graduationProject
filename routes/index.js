@@ -4,5 +4,6 @@ module.exports = [
   require('./cinema'),
   require('./arrange'),
   require('./order'),
-  require('./comment')
+  require('./comment'),
+  require('./upload')
 ]
