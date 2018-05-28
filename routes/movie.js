@@ -47,23 +47,46 @@ const getWillplayMovies = {
   }
 }
 
+const getMovieList = {
+  method: 'POST',
+  path: '/movie/list',
+  options: {
+    validate: {
+      payload: {
+        pageNum: Joi.number().integer().required()
+      }
+    },
+    handler: (req, reply) => {
+      return new Promise((resolve, reject) => {
+        const { pageNum } = req.payload
+        const result = {movies: [], total: 0}
+        const message = [
+          {$match: {}},
+          {$skip: 10 * (pageNum - 1)},
+          {$limit: 10}
+        ]
+
+        movieModel.aggregate(message, (err, movies) => {
+          if (err) {
+            reject(Boom.badImplementation(err.message))
+          } else {
+            result.movies = movies
+            movieModel.find({}, (err, allMovies) => {
+              result.total = allMovies.length
+              resolve(result)
+            })
+          }
+        })
+      })
+    }
+  }
+}
+
 // 添加电影
 const addMovie = {
   method: 'POST',
   path: '/movie/add',
   options: {
-    validate: {
-      payload: {
-        zh_name: Joi.string().min(1).required(),
-        runtime: Joi.string().min(1).required(),
-        genres: Joi.array().required(),
-        actors: Joi.array().required(),
-        directors: Joi.array().required(),
-        region: Joi.array().min(10),
-        language: Joi.string().min(1).required(),
-        image: Joi.string().regex(/^.*\.(jpg|jpeg|png|gif)$/i).required()
-      }
-    },
     handler: (req, reply) => {
       return new Promise((resolve, reject) => {
         new movieModel(req.payload).save((err, movie) => {
@@ -150,15 +173,11 @@ const updateMovie = {
   method: 'POST',
   path: '/movie/update',
   options: {
-    validate: {
-      payload: {
-        movie_id: Joi.number().integer().min(1).required()
-      }
-    },
     handler: (req, reply) => {
-      const { movie_id, movieInfo } = req.payload
+      const { _id } = req.payload
+      delete req.payload._id
       return new Promise((resolve, reject) => {
-        movieModel.findOneAndUpdate({_id: movie_id}, {$set: movieInfo}, {new: true}, (err, movie) => {
+        movieModel.findOneAndUpdate({_id: _id}, {$set: req.payload}, {new: true}, (err, movie) => {
           if (err) {
             reject(Boom.badImplementation(err.message))
           } else {
@@ -198,6 +217,7 @@ module.exports = [
   addMovie,
   getPlayingMovies,
   getWillplayMovies,
+  getMovieList,
   getTopTenMovies,
   getMovie,
   updateMovie,

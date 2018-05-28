@@ -15,7 +15,7 @@ let getUpToken = {
 
 let getDownloadUrl = {
     method: 'POST',
-    path: '/upload/downloadh',
+    path: '/upload/download',
     options: {
         validate: {
             payload: {
